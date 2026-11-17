@@ -47,32 +47,37 @@ export default function App() {
   const [governance, setGovernance] = useState<GovernanceConfig | null>(null);
   const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [liveStreaming, setLiveStreaming] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const loadWorkspaceData = useCallback(async (activeRole: UserRole) => {
     setLoading(true);
+    setLoadError(null);
     try {
       const [pRes, gRes] = await Promise.all([
         fetch('/api/patients', { headers: { 'x-user-role': activeRole } }),
         fetch('/api/governance', { headers: { 'x-user-role': activeRole } }),
       ]);
-      if (pRes.ok) {
-        const pData = await pRes.json();
-        setPatients(pData.patients);
-        if (pData.patients.length > 0 && !pData.patients.some((p: PatientRecord) => p.studyId === selectedStudyId)) {
-          setSelectedStudyId(pData.patients[0].studyId);
-        }
+      if (!pRes.ok || !gRes.ok) {
+        throw new Error(`Server returned HTTP ${pRes.status}/${gRes.status}`);
       }
-      if (gRes.ok) {
-        const gData = await gRes.json();
-        setGovernance(gData.governance);
-        setAuditLogs(gData.auditLogs);
-      }
+      const pData = await pRes.json();
+      const gData = await gRes.json();
+      setPatients(pData.patients);
+      setSelectedStudyId((prev) =>
+        pData.patients.length > 0 && !pData.patients.some((p: PatientRecord) => p.studyId === prev)
+          ? pData.patients[0].studyId
+          : prev
+      );
+      setGovernance(gData.governance);
+      setAuditLogs(gData.auditLogs);
+    } catch (err) {
+      setLoadError(err instanceof Error ? err.message : 'Unable to reach BowelSound-AP backend.');
     } finally {
       setLoading(false);
     }
-  }, [selectedStudyId]);
+  }, []);
 
   useEffect(() => {
     void loadWorkspaceData(role);
@@ -337,7 +342,18 @@ export default function App() {
 
         {/* Active Workspace Viewport */}
         <main className="flex-1 p-4 sm:p-6 max-w-[1440px] w-full mx-auto">
-          {loading || !activePatient ? (
+          {loadError ? (
+            <div className="rounded-lg border border-red-300 bg-red-50 p-6 text-sm text-red-900">
+              <div className="font-semibold">Telemetry Connection Error</div>
+              <p className="mt-1 text-red-800">{loadError}</p>
+              <button
+                onClick={() => void loadWorkspaceData(role)}
+                className="mt-3 rounded-md bg-red-700 px-3.5 py-1.5 text-xs font-medium text-white hover:bg-red-800"
+              >
+                Retry Connection
+              </button>
+            </div>
+          ) : loading || !activePatient ? (
             <div className="space-y-4">
               <div className="h-32 rounded-lg border border-slate-200 bg-white animate-pulse" />
               <div className="h-64 rounded-lg border border-slate-200 bg-white animate-pulse" />

@@ -3,6 +3,20 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      window.addEventListener(
+        'error',
+        function (event) {
+          var src = event && (event.filename || '');
+          var stack = (event && event.error && event.error.stack) || '';
+          if (src.indexOf('chrome-extension://') === 0 || stack.indexOf('chrome-extension://') !== -1) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+          }
+        },
+        true
+      );
+    </script>
     <title>BowelSound-AP — Acute Pancreatitis Acoustic Monitoring & CDSS</title>
     <meta name="description" content="Clinical and research web platform for dynamic severity assessment, therapy response monitoring, and outcome prediction in acute pancreatitis using intestinal peristalsis acoustic analysis." />
     <meta property="og:title" content="BowelSound-AP — Acute Pancreatitis Acoustic Monitoring & CDSS" />
