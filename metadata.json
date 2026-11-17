@@ -1,0 +1,6 @@
+{
+  "name": "BowelSound-AP",
+  "description": "Clinical and research web platform for dynamic severity assessment, therapy response monitoring, and outcome prediction in acute pancreatitis using intestinal peristalsis acoustic analysis.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
