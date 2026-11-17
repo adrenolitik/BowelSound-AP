@@ -1,4 +1,4 @@
-import {
+import type {
   AcousticSegment,
   AcousticTrendPoint,
   ConfounderEvent,
@@ -8,7 +8,7 @@ import {
   PatientRecord,
   PrognosticOutput,
   SoundClass,
-} from '../types/clinical';
+} from '../types/clinical.ts';
 
 export function computeRansonScore(age: number, labs: LabMarkers, is48hOrLater: boolean): number {
   let score = 0;

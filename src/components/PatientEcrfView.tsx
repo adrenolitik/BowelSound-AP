@@ -7,6 +7,7 @@ import {
   PatientRecord,
   UserRole,
 } from '../types/clinical';
+import { apiFetch } from '../utils/apiClient';
 
 interface PatientEcrfViewProps {
   patient: PatientRecord;
@@ -94,7 +95,7 @@ export const PatientEcrfView: React.FC<PatientEcrfViewProps> = ({
     e.preventDefault();
     if (!cfAgent.trim() || !cfDose.trim()) return;
     setSavingCf(true);
-    const res = await fetch(`/api/patients/${patient.studyId}/confounders`, {
+    const res = await apiFetch(`/api/patients/${patient.studyId}/confounders`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-user-role': role },
       body: JSON.stringify({
@@ -117,7 +118,7 @@ export const PatientEcrfView: React.FC<PatientEcrfViewProps> = ({
     e.preventDefault();
     if (!allEligible) return;
     setEnrolling(true);
-    const res = await fetch('/api/patients', {
+    const res = await apiFetch('/api/patients', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-user-role': role },
       body: JSON.stringify({

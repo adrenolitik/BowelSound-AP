@@ -15,6 +15,7 @@ import {
   computeModifiedMarshallScore,
   computeRansonScore,
 } from '../utils/clinicalScoring';
+import { apiFetch } from '../utils/apiClient';
 
 interface ClinicalAnalyticsViewProps {
   patient: PatientRecord;
@@ -102,7 +103,7 @@ export const ClinicalAnalyticsView: React.FC<ClinicalAnalyticsViewProps> = ({
   const handleSaveScaleDay = async (e: React.FormEvent) => {
     e.preventDefault();
     setSavingScale(true);
-    const res = await fetch(`/api/patients/${patient.studyId}/scales`, {
+    const res = await apiFetch(`/api/patients/${patient.studyId}/scales`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-user-role': role },
       body: JSON.stringify({ day: selectedDay, labs: labsForm, agiGrade }),
@@ -118,7 +119,7 @@ export const ClinicalAnalyticsView: React.FC<ClinicalAnalyticsViewProps> = ({
     setFhirStatus(null);
     try {
       const parsed = JSON.parse(fhirJson);
-      const res = await fetch('/api/fhir/import', {
+      const res = await apiFetch('/api/fhir/import', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-user-role': role },
         body: JSON.stringify({ studyId: patient.studyId, bundle: parsed }),
@@ -137,7 +138,7 @@ export const ClinicalAnalyticsView: React.FC<ClinicalAnalyticsViewProps> = ({
   };
 
   const handleExportFhirReport = async () => {
-    const res = await fetch(`/api/fhir/DiagnosticReport/${patient.studyId}`, {
+    const res = await apiFetch(`/api/fhir/DiagnosticReport/${patient.studyId}`, {
       headers: { 'x-user-role': role },
     });
     if (res.ok) {

@@ -21,6 +21,7 @@ import { PatientEcrfView } from './components/PatientEcrfView';
 import { ResearchAnnotationView } from './components/ResearchAnnotationView';
 import { GovernanceSecurityView } from './components/GovernanceSecurityView';
 import { exportClinicalPdfReport } from './utils/exportReports';
+import { apiFetch } from './utils/apiClient';
 
 type WorkspaceTab = 'bedside' | 'analytics' | 'ecrf' | 'research' | 'governance';
 
@@ -56,8 +57,8 @@ export default function App() {
     setLoadError(null);
     try {
       const [pRes, gRes] = await Promise.all([
-        fetch('/api/patients', { headers: { 'x-user-role': activeRole } }),
-        fetch('/api/governance', { headers: { 'x-user-role': activeRole } }),
+        apiFetch('/api/patients', { headers: { 'x-user-role': activeRole } }),
+        apiFetch('/api/governance', { headers: { 'x-user-role': activeRole } }),
       ]);
       if (!pRes.ok || !gRes.ok) {
         throw new Error(`Server returned HTTP ${pRes.status}/${gRes.status}`);
@@ -111,7 +112,7 @@ export default function App() {
           waveformPeak: isBs ? Number((0.45 + Math.random() * 0.4).toFixed(2)) : 0.14,
         },
       ];
-      const res = await fetch('/api/ingest/audio', {
+      const res = await apiFetch('/api/ingest/audio', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-user-role': role },
         body: JSON.stringify({
@@ -130,7 +131,7 @@ export default function App() {
 
   const handlePatientUpdated = (updated: PatientRecord) => {
     setPatients((prev) => prev.map((p) => (p.studyId === updated.studyId ? updated : p)));
-    void fetch('/api/governance', { headers: { 'x-user-role': role } })
+    void apiFetch('/api/governance', { headers: { 'x-user-role': role } })
       .then((r) => r.json())
       .then((g) => setAuditLogs(g.auditLogs));
   };

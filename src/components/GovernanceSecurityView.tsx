@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { EyeOff, Lock, ShieldCheck } from 'lucide-react';
 import { AuditLogEntry, BlindingMode, GovernanceConfig, PatientRecord, UserRole } from '../types/clinical';
+import { apiFetch } from '../utils/apiClient';
 
 interface GovernanceSecurityViewProps {
   patients: PatientRecord[];
@@ -32,7 +33,7 @@ export const GovernanceSecurityView: React.FC<GovernanceSecurityViewProps> = ({
     setErrorMsg(null);
     setUpdatingId(target.studyId);
     const nextMode: BlindingMode = target.blindingMode === 'double_blind' ? 'open_label' : 'double_blind';
-    const res = await fetch(`/api/patients/${target.studyId}/blinding`, {
+    const res = await apiFetch(`/api/patients/${target.studyId}/blinding`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', 'x-user-role': role },
       body: JSON.stringify({ blindingMode: nextMode }),
@@ -50,7 +51,7 @@ export const GovernanceSecurityView: React.FC<GovernanceSecurityViewProps> = ({
   const handleSaveAlgorithm = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
-    const res = await fetch('/api/governance', {
+    const res = await apiFetch('/api/governance', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', 'x-user-role': role },
       body: JSON.stringify({ crnnModelVersion: crnnVersion }),

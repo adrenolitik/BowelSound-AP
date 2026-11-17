@@ -23,6 +23,7 @@ import {
 } from '../types/clinical';
 import { adjustAmplitudeForBmi } from '../utils/clinicalScoring';
 import { playBowelSoundSegment, processUploadedAudioFile } from '../utils/audioDsp';
+import { apiFetch } from '../utils/apiClient';
 
 interface BedsideMonitorViewProps {
   patient: PatientRecord;
@@ -97,7 +98,7 @@ export const BedsideMonitorView: React.FC<BedsideMonitorViewProps> = ({
 
   const handleToggleSensorDetachment = async () => {
     const nextDetached = !patient.sensorStatus.detached;
-    const res = await fetch(`/api/patients/${patient.studyId}/sensor`, {
+    const res = await apiFetch(`/api/patients/${patient.studyId}/sensor`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', 'x-user-role': role },
       body: JSON.stringify({
@@ -119,7 +120,7 @@ export const BedsideMonitorView: React.FC<BedsideMonitorViewProps> = ({
     setIngestionNotice(null);
     try {
       const result = await processUploadedAudioFile(file, segments.length);
-      const res = await fetch('/api/ingest/audio', {
+      const res = await apiFetch('/api/ingest/audio', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-user-role': role },
         body: JSON.stringify({
@@ -176,7 +177,7 @@ export const BedsideMonitorView: React.FC<BedsideMonitorViewProps> = ({
       };
     });
 
-    const res = await fetch('/api/ingest/audio', {
+    const res = await apiFetch('/api/ingest/audio', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-user-role': role },
       body: JSON.stringify({

@@ -18,6 +18,7 @@ import {
   exportDatasetJSON,
   exportDatasetXLSX,
 } from '../utils/exportReports';
+import { apiFetch } from '../utils/apiClient';
 
 interface ResearchAnnotationViewProps {
   patient: PatientRecord;
@@ -53,7 +54,7 @@ export const ResearchAnnotationView: React.FC<ResearchAnnotationViewProps> = ({
 
   const handleAssignLabel = async (seg: AcousticSegment, label: SoundClass) => {
     setAnnotatingId(seg.id);
-    const res = await fetch(`/api/patients/${patient.studyId}/annotations`, {
+    const res = await apiFetch(`/api/patients/${patient.studyId}/annotations`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-user-role': role },
       body: JSON.stringify({ segmentId: seg.id, expertLabel: label }),
